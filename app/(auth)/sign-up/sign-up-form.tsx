@@ -3,17 +3,17 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signInDefaultValues } from "@/lib/constants";
+import { signUpDefaultValues } from "@/lib/constants";
 import Link from "next/link";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { signInWithCredentials } from "@/lib/actions/user.actions";
+import { signUpUser } from "@/lib/actions/user.actions";
 import { useSearchParams } from "next/navigation";
 
 
 
-const CredentialsSignInForm = () => {
-    const [data, action] = useActionState(signInWithCredentials, {
+const SignUpForm = () => {
+    const [data, action] = useActionState(signUpUser, {
         success: false,
         message: ''
     });
@@ -22,13 +22,13 @@ const CredentialsSignInForm = () => {
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get('callbackUrl') || '/'; 
 
-    const SignInButton = () => {
+    const SignUpButton = () => {
         const { pending } = useFormStatus();
 
 
         return (
             <Button disabled={pending} className='w-full' variant='default'>
-                { pending ? 'Signing In...' : 'Sign In' }
+                { pending ? 'Hesap Oluşturuluyor...' : 'Kayıt Ol' }
             </Button>
         )
     }
@@ -38,15 +38,26 @@ const CredentialsSignInForm = () => {
     return <form action={action}>
         <input type="hidden" name="callbackUrl" value={callbackUrl}/>
         <div className="space-y-6">
-        <div>
+            <div>
+            <Label htmlFor='name'>İsim</Label>
+            <Input
+                id="name"
+                name="name"
+                type="text"
+                
+                autoComplete="name" 
+                defaultValue={signUpDefaultValues.name}
+            />
+            </div>
+            <div>
             <Label htmlFor='email'>Email</Label>
             <Input
                 id="email"
                 name="email"
-                type="email"
-                required
+                type="text"
+                
                 autoComplete="email" 
-                defaultValue={signInDefaultValues.email}
+                defaultValue={signUpDefaultValues.email}
             />
             </div>
             <div>
@@ -57,11 +68,22 @@ const CredentialsSignInForm = () => {
                 type="password"
                 required
                 autoComplete="password" 
-                defaultValue={signInDefaultValues.password}
+                defaultValue={signUpDefaultValues.password}
             />
             </div>
             <div>
-                <SignInButton />
+            <Label htmlFor='confirmPassword'>Şifreyi Onayla</Label>
+            <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                required
+                autoComplete="confirmPassword" 
+                defaultValue={signUpDefaultValues.confirmPassword}
+            />
+            </div>
+            <div>
+                <SignUpButton />
             </div>
 
             {data && !data.success && (
@@ -72,13 +94,13 @@ const CredentialsSignInForm = () => {
 
 
             <div className="text-sm text-center text-muted-foreground">
-                Hesabınız Yok mu?{' '}
+                Hesabınız Var mı?{' '}
                 <Link href='/sign-up' target='_self' className='link'>
-                Kayıt Ol
+                Giriş Yap
                 </Link>
             </div>
         </div>
     </form>;
 }
  
-export default CredentialsSignInForm;
+export default SignUpForm;
