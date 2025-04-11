@@ -13,4 +13,13 @@ export const signUpDefaultValues = {
     email: '',
     password: '',
     confirmPassword: '',
-}
+};
+
+
+export const shippingAddressDefaultValues = {
+    fullName: 'Mehmet Doe',
+    streetAddress: '123 Main st',
+    city: 'Anytown',
+    postalCode: '12345',
+    country: 'Turkey'
+};
