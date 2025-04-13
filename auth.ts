@@ -6,9 +6,6 @@ import { compareSync } from 'bcrypt-ts-edge';
 import { authConfig } from './auth.config';
 import { cookies } from 'next/headers';
 
-
-
-
 export const config = {
     pages: {
         signIn: '/sign-in',
