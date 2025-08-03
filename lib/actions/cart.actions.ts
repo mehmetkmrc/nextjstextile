@@ -30,7 +30,6 @@ const calcPrice = (items: CartItem[])=>{
 }
 
 export async function addItemToCart(data: CartItem){
-    
     try {
         //Check for cart cookie
         const sessionCartId = (await cookies()).get('sessionCartId')?.value;
@@ -96,11 +95,15 @@ export async function addItemToCart(data: CartItem){
                 //Add item to the cart.items
                 cart.items.push(item);
                 
-                //Save to Database
+                
+            }
+
+            //Save to Database
                 await  prisma.cart.update({
                     where: {id: cart.id},
                     data: {
-                        items: cart.items as Prisma.CartUpdateitemsInput[]
+                        items: cart.items as Prisma.CartUpdateitemsInput[],
+                        ...calcPrice(cart.items as CartItem[]),
                     }
                 });
 
@@ -109,9 +112,8 @@ export async function addItemToCart(data: CartItem){
 
                 return {
                     success: true,
-                    message: `${product.name} ${existItem ? 'updated in' : 'added to'} cart`
-                }
-            }
+                    message: `${product.name} ${existItem ? 'updated in' : 'added to'} cart`,
+                };
         }
     } catch (error) {
         return {
@@ -182,7 +184,9 @@ export async function removeItemFromCart(productId: string) {
         //Update cart in database
         await prisma.cart.update({
             where: {id: cart.id},
-            data: {items: cart.items as Prisma.CartUpdateitemsInput[]}
+            data: {items: cart.items as Prisma.CartUpdateitemsInput[],
+               ...calcPrice(cart.items as CartItem[]), 
+            }
         });
 
         revalidatePath(`/product/${product.slug}`);

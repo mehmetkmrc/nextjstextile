@@ -45,7 +45,7 @@ const CartTable = ({cart}: {cart?: Cart}) => {
                                 </TableCell>
                                 <TableCell className="flex-center gap-2">
                                     <Button disabled={isPending} variant="outline" type='button' onClick={() => startTransition(async () =>{
-                                        const res = await removeItemFromCart(item.productId);
+                                        const res = await addItemToCart(item);
 
                                         if(!res.success){
                                             toast({
@@ -63,7 +63,7 @@ const CartTable = ({cart}: {cart?: Cart}) => {
                                     </Button>
                                     <span>{item.qty}</span>
                                     <Button disabled={isPending} variant="outline" type='button' onClick={() => startTransition(async () =>{
-                                        const res = await addItemToCart(item);
+                                        const res = await removeItemFromCart(item.productId);
 
                                         if(!res.success){
                                             toast({
@@ -95,14 +95,14 @@ const CartTable = ({cart}: {cart?: Cart}) => {
                                 {formatCurrency(cart.itemsPrice)}
                             </span>
                         </div>
-                        <Button className="w-full" disabled={isPending} onClick={ () => startTransition(() => router.push('/shipping-address')) }>
-                            { isPending ? (
-                                <Loader className="w-4 h-4 animate-spin"/>
-                            ): ( 
-                                <ArrowRight className="w-4 h-4 animate" />
-                            ) } {' '}
-                            Proceed to Checkout
-                        </Button>
+                            <Button className="w-full" disabled={isPending} onClick={() => startTransition(() => router.push('/shipping-address'))}>
+                                {isPending ? (
+                                    <Loader className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <ArrowRight className="w-4 h-4 animate" />
+                                )} {' '}
+                                Proceed to Checkout
+                            </Button>
                 </CardContent>
             </Card>
         </div>
