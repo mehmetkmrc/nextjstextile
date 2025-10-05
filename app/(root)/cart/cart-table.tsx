@@ -45,7 +45,7 @@ const CartTable = ({cart}: {cart?: Cart}) => {
                                 </TableCell>
                                 <TableCell className="flex-center gap-2">
                                     <Button disabled={isPending} variant="outline" type='button' onClick={() => startTransition(async () =>{
-                                        const res = await addItemToCart(item);
+                                        const res = await removeItemFromCart(item.productId);
 
                                         if(!res.success){
                                             toast({
@@ -63,7 +63,7 @@ const CartTable = ({cart}: {cart?: Cart}) => {
                                     </Button>
                                     <span>{item.qty}</span>
                                     <Button disabled={isPending} variant="outline" type='button' onClick={() => startTransition(async () =>{
-                                        const res = await removeItemFromCart(item.productId);
+                                        const res = await addItemToCart(item);
 
                                         if(!res.success){
                                             toast({
