@@ -1,6 +1,6 @@
 import CryptoJS from "crypto-js";
 
-const apiUrl = process.env.IYZICO_API_URL || "https://sandbox-api.iyzipay.com";
+const apiUrl = process.env.IYZICO_API_URL;
 const apiKey = process.env.IYZICO_CLIENT_ID || "";
 const secretKey = process.env.IYZICO_APP_SECRET || "";
 
@@ -11,49 +11,64 @@ const secretKey = process.env.IYZICO_APP_SECRET || "";
 // }
 
 // İmza üret
-function generateAuthorizationString(): string {
-  const randomKey = Date.now().toString();
+function getUriPath(fullUrl: string): string {
+  const url = new URL(fullUrl);
+  return url.pathname; // sadece path kısmını alır
+}
 
-  // apiKey + randomKey → secretKey ile HMAC
-  const textToSign = apiKey + randomKey;
-  const hmac = CryptoJS.HmacSHA256(textToSign, secretKey);
-  const signature = CryptoJS.enc.Base64.stringify(hmac);
+function generateAuthorizationString(uriPath: string, body: any): string {
+  const randomVar = "123456789";
+  const randomKey = Date.now().toString() + randomVar;
 
-  return `IYZWSv2 apiKey:${apiKey}&randomKey:${randomKey}&signature:${signature}`;
+  const payload = uriPath + JSON.stringify(body ?? {}, Object.keys(body ?? {}).sort());
+
+  const dataToEncrypt = randomKey + payload;
+
+  const encryptedData = CryptoJS.HmacSHA256(dataToEncrypt, secretKey);
+  const signature = CryptoJS.enc.Hex.stringify(encryptedData);
+
+  const authorizationString =
+    `apiKey:${apiKey}&randomKey:${randomKey}&signature:${signature}`;
+  const base64EncodedAuthorization = CryptoJS.enc.Base64.stringify(
+    CryptoJS.enc.Utf8.parse(authorizationString)
+  );
+
+  return `IYZWSv2 ${base64EncodedAuthorization}`;
 }
 
 export const iyzico = {
-  // Örnek kullanım
   initializePayment: async function initializePayment(body: any) {
-  const url = `${apiUrl}/payment/pay-with-iyzico/initialize`;
+    const url = `${apiUrl}/payment/pay-with-iyzico/initialize`;
 
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: generateAuthorizationString(),
-    },
-    body: JSON.stringify(body),
-  });
+    const bodyString = JSON.stringify(body, Object.keys(body).sort());
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: generateAuthorizationString(getUriPath(url), body),
+      },
+      body: bodyString,
+    });
 
-  return handleResponse(response);
+
+    return handleResponse(response);
   },
-  capturePayment: async function capturePayment(body: any){
-  const url = `${apiUrl}/payment/iyzipos/checkoutform/auth/ecom/detail`;
+  capturePayment: async function capturePayment(body: any) {
+    const url = `${apiUrl}/payment/iyzipos/checkoutform/auth/ecom/detail`;
 
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: generateAuthorizationString(),
-    },
-    body: JSON.stringify(body),
-  });
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: generateAuthorizationString(getUriPath(url), body),
+      },
+      body: JSON.stringify(body),
+    });
 
-  return handleResponse(response);
- }
+    return handleResponse(response);
+  },
+};
 
-}
 
 async function handleResponse(response: Response){
   if(response.ok){
