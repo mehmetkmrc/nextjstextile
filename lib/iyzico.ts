@@ -20,10 +20,9 @@ function generateAuthorizationString(uriPath: string, body: any): string {
   const randomVar = "123456789";
   const randomKey = Date.now().toString() + randomVar;
 
-  const payload = uriPath + JSON.stringify(body ?? {}, Object.keys(body ?? {}).sort());
+  const payload = uriPath + (body ? JSON.stringify(body) : "");
 
   const dataToEncrypt = randomKey + payload;
-
   const encryptedData = CryptoJS.HmacSHA256(dataToEncrypt, secretKey);
   const signature = CryptoJS.enc.Hex.stringify(encryptedData);
 
@@ -40,7 +39,7 @@ export const iyzico = {
   initializePayment: async function initializePayment(body: any) {
     const url = `${apiUrl}/payment/pay-with-iyzico/initialize`;
 
-    const bodyString = JSON.stringify(body, Object.keys(body).sort());
+    const bodyString = JSON.stringify(body);
     const response = await fetch(url, {
       method: "POST",
       headers: {
