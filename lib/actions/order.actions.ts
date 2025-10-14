@@ -7,7 +7,7 @@ import { getUserById } from './user.actions';
 import { insertOrderSchema } from '../validators';
 import { prisma } from '@/db/prisma';
 import { CartItem, PaymentResult, ShippingAddress } from '@/types';
-import { paypal } from '../iyzico';
+import { iyzico } from '../iyzico';
 import { revalidatePath } from 'next/cache';
 import { PAGE_SIZE } from '../constants';
 import { Prisma } from '@prisma/client';
@@ -117,7 +117,7 @@ export async function createPayPalOrder(orderId: string) {
 
     if (order) {
       // Create paypal order
-      const paypalOrder = await paypal.createOrder(Number(order.totalPrice));
+      const paypalOrder = await iyzico.initializePayment(order);
 
       // Update order with paypal order id
       await prisma.order.update({
@@ -160,7 +160,7 @@ export async function approvePayPalOrder(
 
     if (!order) throw new Error('Order not found');
 
-    const captureData = await paypal.capturePayment(data.orderID);
+    const captureData = await iyzico.capturePayment(data.orderID);
 
     if (
       !captureData ||
