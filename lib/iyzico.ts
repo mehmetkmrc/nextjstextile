@@ -55,6 +55,7 @@ export const iyzico = {
   capturePayment: async function capturePayment(body: any) {
     const url = `${apiUrl}/payment/iyzipos/checkoutform/auth/ecom/detail`;
 
+
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -67,8 +68,6 @@ export const iyzico = {
     return handleResponse(response);
   },
 };
-
-
 async function handleResponse(response: Response){
   if(response.ok){
     return response.json();
@@ -77,6 +76,5 @@ async function handleResponse(response: Response){
     throw new Error(errorMessage);
   }
 }
-
 
 export { generateAuthorizationString };
